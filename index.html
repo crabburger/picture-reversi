@@ -299,7 +299,7 @@
         card.setAttribute('class', 'card');
         let qimages = document.createElement('img');
         qimages.setAttribute('class', 'qimages');
-        qimages.setAttribute('src', '../.assets/' + comb[i].value);
+        qimages.setAttribute('src', 'assets/' + comb[i].value);
         tr.appendChild(document.createElement('td'))
           .appendChild(card)
           .appendChild(qimages)
@@ -320,7 +320,7 @@
         card.setAttribute('class', 'card');
         let qimages = document.createElement('img');
         qimages.setAttribute('class', 'qimages');
-        qimages.setAttribute('src', '../.assets/' + selected_data[i].value);
+        qimages.setAttribute('src', 'assets/' + selected_data[i].value);
         card.append(qimages);
         display.append(card);
       }
