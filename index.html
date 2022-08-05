@@ -16,6 +16,7 @@
       padding: 0;
     }
 
+
     body {
       background-color: lightgray;
     }
@@ -214,6 +215,7 @@
     <div class="cards_layout" id="cards">
     </div>
   </div>
+  </div>
   <script>
     //generate selectable cards
     Papa.parse("globalcsv/2dropdownlist.csv", {
@@ -271,7 +273,7 @@
           complete: function (result) {
             //let selected_data = result.data;
             combined_arrays.push(...result.data);
-              
+
           }
         });
       };
@@ -305,23 +307,6 @@
       display.appendChild(table).setAttribute('class', 'card_table');
       return;
     };
-
-    // function to generate cards from parsed array
-    selected_data = undefined;
-    function renderData(selected_data) {
-      //let display = document.getElementById("cards");
-      for (let i = 0, n = selected_data.length; i < n; i++) {
-        console.log(selected_data[i].value);
-        //console.log(selected_data[i].label);
-        let card = document.createElement("div");
-        card.setAttribute('class', 'card');
-        let qimages = document.createElement('img');
-        qimages.setAttribute('class', 'qimages');
-        qimages.setAttribute('src', 'assets/' + selected_data[i].value);
-        card.append(qimages);
-        display.append(card);
-      }
-    }
 
     function shuffleArray(combined_arrays) {
       for (let i = combined_arrays.length - 1; i > 0; i--) {
@@ -377,23 +362,6 @@
       }
     }
 
-
-    var frame_to_gen = 36;
-    let gen_frame = document.getElementById("number_layout");
-    function genframe() {
-      for (let i = 0; i < frame_to_gen; i++) {
-        divnumber = document.createElement("div");
-        divnumber.className = "number";
-        //divnumber.setAttribute('onclick', 'toggleclass(this);');
-        //divnumber.id = 'a' + i;
-        //divnumber.innerHTML = i + 1;
-        gen_frame.append(divnumber);
-        const childb = document.createElement("b");
-        childb.innerHTML = i + 1;
-        divnumber.appendChild(childb);
-      }
-    }
-
     // shuffle cards 
     function shuffle() {
       $(".cards_layout").each(function () {
@@ -412,13 +380,7 @@
         for (var i = 0; i < divs.length; i++) $(divs[i]).appendTo(this);
       });
     }
-    // show side panel
-    $('.arrowr').click(function () {
-      $('.top').animate({
-        position: "absolute",
-        left: "0px"
-      }, 80);
-    });
+
 
     (function () {
 
