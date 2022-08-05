@@ -1,0 +1,182 @@
+* {
+    font-family: 'Lexend', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: lightgray;
+}
+
+.cards_layer {
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%);
+    overflow: hidden;
+    z-index: 0;
+}
+
+.card {
+    width: 16.3333vh;
+    height: 16.3333vh;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    font-size: 5vh;
+    color: #000000;
+    cursor: pointer;
+    display: inline-flex;
+    flex-flow: column;
+    overflow: hidden;
+    word-wrap: normal;
+    background: white;
+}
+
+.top {
+    position: absolute;
+    justify-content: center;
+    width: 100vw;
+    height: 130vh;
+    left: 0;
+    top: 0;
+    z-index: 5;
+    background-color: rgba(85, 85, 85, 0.9);
+}
+
+.selgroup {
+    display: flex;
+    flex-direction: column;
+    position: inherit;
+    top: 40px;
+    gap: 1vh;
+}
+
+.sub {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    justify-content: center;
+    align-items: center;
+}
+
+.nosub {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    justify-content: center;
+    align-items: center;
+}
+
+.selected {
+    height: 10vh;
+    width: 9vw;
+    background-color: #f8420a;
+    border: solid 1px black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 1vh;
+}
+
+.selectable {
+    height: 10vh;
+    width: 9vw;
+    background-color: white;
+    border: solid 1px black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 1vh;
+}
+
+
+.button {
+    background-color: #033e96;
+    border: none;
+    color: white;
+    padding: 6px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+    border-radius: 0.5em;
+    z-index: 4;
+}
+
+.button:hover {
+    background-color: #03a3a8
+}
+
+.button:active {
+    background-color: #7e0808;
+    box-shadow: 0 5px #666;
+    transform: translateY(4px);
+}
+
+.csvlist {
+    z-index: 1;
+}
+
+.subbtn {
+    position: fixed;
+    top: 0px;
+    left: 50%;
+    transform: translate(-50%);
+    z-index: 1;
+}
+
+.close {
+    position: fixed;
+    left: 50vw;
+}
+
+.arrowr {
+    width: 5vw;
+    height: auto;
+    position: absolute;
+    bottom: 0px;
+    left: 5%;
+    z-index: 1;
+    opacity: 0.3;
+    transition: .5s ease;
+}
+
+.arrowr:hover {
+    opacity: 1;
+}
+
+
+table {
+    margin: 0 auto;
+}
+
+tr {
+    border: 0px solid #ccc;
+    padding: 0;
+    line-height: 0;
+}
+
+td {
+    border: 0px solid #ccc;
+    padding: 0;
+    margin: 0;
+    line-height: 0;
+}
+
+.qimages {
+    display: inline-block;
+    height: 16.3333vh;
+    margin: 0em;
+}

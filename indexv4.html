@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>reversi</title>
+  <link rel="shortcut icon" href="#" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <link href="https://fonts.googleapis.com/css2?family=Lexend&display=swap" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://unpkg.com/papaparse@5.3.2/papaparse.min.js"></script>
+  <link href="styling.css" rel="stylesheet">
+</head>
+
+<body>
+  <img class="arrowr" src="btn_up.png" onclick="showtop(), removesel()"></img>
+  <div class="top" id="top">
+    <div class="subbtn">
+      <button class="button button1" id='submitbtn' onclick="update()">Select</button>
+      <button class="button button1" id='submitbtn2' onclick="gentable(), hidetop()">Make deck</button>
+
+      <button class="button close" id="closemodal" onclick="hidetop()">Close</button>
+    </div>
+    <div class="selgroup">
+      <div class="sub"></div>
+      <div class="nosub"></div>
+    </div>
+  </div>
+  <div class="cards_layer">
+    <div class="cards_layout" id="cards">
+    </div>
+  </div>
+  </div>
+  <script>
+    //generate selectable cards
+    Papa.parse("globalcsv/2dropdownlist.csv", {
+      download: true,
+      delimiter: ",",
+      skipEmptyLines: true,
+      header: true,
+      complete: function (results) {
+        //console.log("Finished:", results.data);
+        let csv_list = results.data;
+        renderSelgroup(csv_list);
+        move_nosub();
+        fitText(document.querySelectorAll(".selectable"), 0.7);
+      }
+    })
+
+    function renderSelgroup(csv_list) {
+      for (let i = 0, n = csv_list.length; i < n; i++) {
+        // https://stackoverflow.com/questions/13782525/how-do-i-manipulate-objects-within-arrays
+        //console.log(csv_list[i].value);
+        //console.log(csv_list[i].label);
+        var selectable = document.createElement("div");
+        selectable.className = 'selectable';
+        selectable.setAttribute('onclick', 'toggleclass(this)');
+        selectable.setAttribute('data-value', csv_list[i].value);
+        selectable.innerHTML = (csv_list[i].label);
+        document.querySelector('.sub').appendChild(selectable);
+      }
+    }
+
+    function move_nosub() {
+      var withoutsub = document.querySelectorAll('[data-value*="without subtitles"]');
+      $(withoutsub).detach().appendTo('.nosub');
+    }
+
+    //gen cards function
+    function update() {
+      removeold();
+      //push data of matching class to array
+      var div = document.getElementsByClassName('selected');
+      var selected_csv = [];
+      for (let k = 0, n = div.length; k < n; k++) {
+        //      for (var i = 0; i < div.length; i++) {
+        selected_csv.push(div[k].getAttribute('data-value'));
+      }
+      console.log(selected_csv);
+      //parse each entry of array and gen cards
+      for (let l = 0, n = selected_csv.length; l < n; l++) {
+        //      for (var l = 0; l < selected_csv.length; l++) {
+        Papa.parse(selected_csv[l], {
+          download: true,
+          delimiter: ",",
+          skipEmptyLines: true,
+          header: true,
+          complete: function (result) {
+            //let selected_data = result.data;
+            combined_arrays.push(...result.data);
+
+          }
+        });
+      };
+    };
+
+    var combined_arrays = [];
+
+    function gentable() {
+      update();
+      shuffleArray(combined_arrays)
+      var comb = combined_arrays;
+      var columns = 6,
+        //l = combined_arrays.length, i,
+        table = document.createElement('table'),
+        tbody = table.appendChild(document.createElement('tbody')),
+        tr, td, img;
+      let display = document.getElementById("cards");
+
+      for (i = 0, l = comb.length; i < l; i++) {
+        if (i % columns == 0) tr = tbody.appendChild(document.createElement('tr'));
+        let card = document.createElement("div");
+        card.setAttribute('class', 'card');
+        let qimages = document.createElement('img');
+        qimages.setAttribute('class', 'qimages');
+        qimages.setAttribute('src', 'assets/' + comb[i].value);
+        tr.appendChild(document.createElement('td'))
+          .appendChild(card)
+          .appendChild(qimages)
+        //.src = '../.assets/' + combined_arrays[i].value;
+      }
+      display.appendChild(table).setAttribute('class', 'card_table');
+      return;
+    };
+
+    function shuffleArray(combined_arrays) {
+      for (let i = combined_arrays.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const temp = combined_arrays[i];
+        combined_arrays[i] = combined_arrays[j];
+        combined_arrays[j] = temp;
+      }
+      return combined_arrays;
+    }
+
+    //add remove class
+    function toggleclass(selectable) {
+      window.clicked = selectable;
+      if (clicked.classList.contains('selected')) {
+        clicked.classList.remove('selected');
+        clicked.classList.add('selectable');
+      }
+      else {
+        clicked.classList.remove('selectable');
+        clicked.classList.add('selected');
+      };
+    }
+
+
+    function hidetop() {
+      let top = document.querySelector(".top");
+      top.setAttribute("style", "display: none");
+    }
+
+    function showtop() {
+      let top = document.querySelector(".top");
+      top.setAttribute("style", "display: block");
+      combined_arrays.length = 0;
+    }
+
+    // function to remove old cards from deck
+    async function removesel() {
+      var x, i;
+      x = document.querySelectorAll(".selected");
+      for (i = 0; i < x.length; i++) {
+        x[i].setAttribute('class', 'selectable');
+      }
+      return;
+    }
+
+    // function to remove old cards from deck
+    function removeold() {
+      var x, i;
+      x = document.querySelectorAll(".card_table");
+      for (i = 0; i < x.length; i++) {
+        x[i].remove();
+      }
+    }
+
+    // shuffle cards 
+    function shuffle() {
+      $(".cards_layout").each(function () {
+        var divs = $(this).find('.card');
+        for (var i = 0; i < divs.length; i++) $(divs[i]).remove();
+        //the fisher yates algorithm, from http://stackoverflow.com/questions/2450954/how-to-randomize-a-javascript-array
+        var i = divs.length;
+        if (i == 0) return false;
+        while (--i) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var tempi = divs[i];
+          var tempj = divs[j];
+          divs[i] = tempj;
+          divs[j] = tempi;
+        }
+        for (var i = 0; i < divs.length; i++) $(divs[i]).appendTo(this);
+      });
+    }
+
+
+    (function () {
+
+      var addEvent = function (el, type, fn) {
+        if (el.addEventListener)
+          el.addEventListener(type, fn, false);
+        else
+          el.attachEvent('on' + type, fn);
+      };
+
+      var extend = function (obj, ext) {
+        for (var key in ext)
+          if (ext.hasOwnProperty(key))
+            obj[key] = ext[key];
+        return obj;
+      };
+
+      window.fitText = function (el, kompressor, options) {
+
+        var settings = extend({
+          'minFontSize': -1 / 0,
+          'maxFontSize': 1 / 0
+        }, options);
+
+        var fit = function (el) {
+          var compressor = kompressor || 1;
+
+          var resizer = function () {
+            el.style.fontSize = Math.max(Math.min(el.clientWidth / (compressor * 10), parseFloat(settings.maxFontSize)), parseFloat(settings.minFontSize)) + 'px';
+          };
+
+          // Call once to set.
+          resizer();
+
+          // Bind events
+          // If you have any js library which support Events, replace this part
+          // and remove addEvent function (or use original jQuery version)
+          addEvent(window, 'resize', resizer);
+          addEvent(window, 'orientationchange', resizer);
+        };
+
+        if (el.length)
+          for (var i = 0; i < el.length; i++)
+            fit(el[i]);
+        else
+          fit(el);
+
+        // return set of elements
+        return el;
+      };
+    })();
+  </script>
+</body>
+
+</html>
