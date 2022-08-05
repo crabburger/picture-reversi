@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>reversi</title>
+  <link rel="shortcut icon" href="#" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <link href="https://fonts.googleapis.com/css2?family=Lexend&display=swap" rel="stylesheet">
+  <script src="../.js/jquery3.6.0.min.js"></script>
+  <script src="../.js/papaparse.min.js"></script>
+  <script src='../.js/fittext.js'></script>
+  <link href="app.css" rel="stylesheet">
+  <style>
+    * {
+      font-family: 'Lexend', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    @keyframes rainbow {
+      0% {
+        border-color: rgb(255, 0, 0);
+      }
+
+      10% {
+        border-color: rgb(255, 0, 255);
+      }
+
+      20% {
+        border-color: rgb(115, 0, 255);
+      }
+
+      30% {
+        border-color: rgb(0, 0, 255);
+      }
+
+      40% {
+        border-color: rgb(0, 115, 255);
+      }
+
+      50% {
+        border-color: rgb(0, 225, 255);
+      }
+
+      60% {
+        border-color: rgb(0, 255, 115);
+      }
+
+      70% {
+        border-color: rgb(0, 255, 0);
+      }
+
+      80% {
+        border-color: rgb(255, 255, 0);
+      }
+
+      90% {
+        border-color: rgb(255, 115, 0);
+      }
+
+      100% {
+        border-color: rgb(255, 0, 0);
+      }
+    }
+
+    body {
+      background-color: lightgray;
+    }
+
+    .cards_layer {
+      width: 100vw;
+      height: 100vh;
+      position: absolute;
+      left: 50%;
+      transform: translate(-50%);
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    #game_layer {
+      width: 100vw;
+      height: 100vh;
+      position: absolute;
+      left: 50%;
+      transform: translate(-50%);
+      z-index: 0;
+    }
+
+    .number_layer {
+      width: 100vw;
+      height: 100vh;
+      position: absolute;
+      left: 50%;
+      transform: translate(-50%);
+    }
+
+    .number_layout {
+      width: 100vh;
+      height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr;
+      gap: 0.4vh;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .card {
+      width: 16.3333vh;
+      height: 16.3333vh;
+      text-align: center;
+      justify-content: center;
+      align-items: center;
+      border-radius: 5px;
+      font-size: 5vh;
+      color: #000000;
+      cursor: pointer;
+      display: inline-flex;
+      flex-flow: column;
+      overflow: hidden;
+      word-wrap: normal;
+      background: white;
+    }
+
+    .top {
+      position: absolute;
+      justify-content: center;
+      width: 100vw;
+      height: 130vh;
+      left: 0;
+      top: 0;
+      z-index: 5;
+      background-color: rgba(85, 85, 85, 0.9);
+    }
+
+    .selgroup {
+      display: flex;
+      flex-direction: column;
+      position: inherit;
+      top: 40px;
+      gap: 1vh;
+    }
+
+    .sub {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .nosub {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .selected {
+      height: 10vh;
+      width: 9vw;
+      background-color: #f8420a;
+      border: solid 1px black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 1vh;
+    }
+
+    .selectable {
+      height: 10vh;
+      width: 9vw;
+      background-color: white;
+      border: solid 1px black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 1vh;
+    }
+
+
+    .button {
+      background-color: #033e96;
+      border: none;
+      color: white;
+      padding: 6px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      transition-duration: 0.4s;
+      cursor: pointer;
+      border-radius: 0.5em;
+      z-index: 4;
+    }
+
+    .button:hover {
+      background-color: #03a3a8
+    }
+
+    .button:active {
+      background-color: #7e0808;
+      box-shadow: 0 5px #666;
+      transform: translateY(4px);
+    }
+
+    .csvlist {
+      z-index: 1;
+    }
+
+    .subbtn {
+      position: fixed;
+      top: 0px;
+      left: 50%;
+      transform: translate(-50%);
+      z-index: 1;
+    }
+
+    .close {
+      position: fixed;
+      left: 50vw;
+    }
+
+    .arrowr {
+      width: 5vw;
+      height: auto;
+      position: absolute;
+      bottom: 0px;
+      left: 5%;
+      z-index: 1;
+      opacity: 0.3;
+      transition: .5s ease;
+    }
+
+    .arrowr:hover {
+      opacity: 1;
+    }
+
+    .rwrapper {
+      height: 100vh;
+      width: 100vw;
+      position: absolute;
+      top: 0;
+      background-color: rgb(0, 0, 0);
+      background-color: rgba(0, 0, 0, 0.9);
+      z-index: 5;
+    }
+
+    #inputtext {
+      height: 4vh;
+      font-size: 2.5vh;
+      display: contents;
+      color: white;
+    }
+
+    #inputfile {
+      height: 4vh;
+      font-size: 2.5vh;
+      display: flex;
+      color: white;
+    }
+
+    a {
+      position: relative;
+      font-size: 20px;
+      bottom: 2%;
+      transform: translate(-1%, -1%);
+      background: rgb(0, 0, 48);
+      color: white;
+      border-radius: 5px;
+      width: fit-content;
+    }
+
+    b {
+      font-size: 3vh;
+      text-align: center;
+      position: relative;
+      left: 0;
+      top: 12vh;
+      background-color: rgb(248, 213, 17);
+      width: 16.3333vh;
+      display: block;
+      border-radius: 5px;
+    }
+
+    table {
+      margin: 0 auto;
+    }
+
+    tr {
+      border: 0px solid #ccc;
+      padding: 0;
+      line-height: 0;
+    }
+
+    td {
+      border: 0px solid #ccc;
+      padding: 0;
+      margin: 0;
+      line-height: 0;
+    }
+
+    .qimages {
+      display: inline-block;
+      height: 16.3333vh;
+      margin: 0em;
+    }
+  </style>
+</head>
+
+<body>
+  <img class="arrowr" src="btn_up.png" onclick="showtop(), removesel()"></img>
+  <div class="top" id="top">
+    <div class="subbtn">
+      <button class="button button1" id='submitbtn' onclick="update()">Select</button>
+      <button class="button button1" id='submitbtn2' onclick="gentable(), hidetop()">Make deck</button>
+
+      <button class="button button1" id="gen" onclick="shuffle(), hidetop()">Shuffle deck</button>
+      <button class="button close" id="closemodal" onclick="hidetop()">Close</button>
+    </div>
+    <div class="selgroup">
+      <div class="sub"></div>
+      <div class="nosub"></div>
+    </div>
+  </div>
+  <div class="cards_layer">
+    <div class="cards_layout" id="cards">
+    </div>
+  </div>
+  <!--div class="number_layer">
+    <div class="number_layout" id="number_layout">
+    </div>
+  </div-->
+  <div id="game_layer">
+    <div id="main" class="container">
+      <div id="game-board" style="display: none;"></div>
+      <div class="info">
+        <div id="current-player">Current player: <span id="current-player-name">-</span></div>
+        <div id="message"></div>
+        <div id="console"></div>
+        <div id="stats"></div>
+        <div id="preference-pane">
+          <div id="player-type-forms" style="display: none;">
+            <label>
+              Black:
+              <select id="black-player-type">
+                <option value="human" selected>Human</option>
+              </select>
+            </label>
+            <label>
+              White:
+              <select id="white-player-type">
+                <option value="human" selected>Human</option>
+              </select>
+            </label>
+          </div>
+          <div style="display: none;">
+            <label>
+              <input id="repeat-games" type="checkbox">
+              Repeat games
+            </label>
+          </div>
+          <button id="start-button" class="btn btn-primary" type="submit">Start a new game</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="othello.js"></script>
+  <script src="app.js"></script>
+  <script>
+    //generate selectable cards
+    Papa.parse("../.globalcsv/2dropdownlist.csv", {
+      download: true,
+      delimiter: ",",
+      skipEmptyLines: true,
+      header: true,
+      complete: function (results) {
+        //console.log("Finished:", results.data);
+        let csv_list = results.data;
+        renderSelgroup(csv_list);
+        move_nosub();
+        fitText(document.querySelectorAll(".selectable"), 0.7);
+      }
+    })
+
+    function renderSelgroup(csv_list) {
+      for (let i = 0, n = csv_list.length; i < n; i++) {
+        // https://stackoverflow.com/questions/13782525/how-do-i-manipulate-objects-within-arrays
+        //console.log(csv_list[i].value);
+        //console.log(csv_list[i].label);
+        var selectable = document.createElement("div");
+        selectable.className = 'selectable';
+        selectable.setAttribute('onclick', 'toggleclass(this)');
+        selectable.setAttribute('data-value', csv_list[i].value);
+        selectable.innerHTML = (csv_list[i].label);
+        document.querySelector('.sub').appendChild(selectable);
+      }
+    }
+
+    function move_nosub() {
+      var withoutsub = document.querySelectorAll('[data-value*="without subtitles"]');
+      $(withoutsub).detach().appendTo('.nosub');
+    }
+
+    //gen cards function
+    function update() {
+      removeold();
+      //push data of matching class to array
+      var div = document.getElementsByClassName('selected');
+      var selected_csv = [];
+      for (let k = 0, n = div.length; k < n; k++) {
+        //      for (var i = 0; i < div.length; i++) {
+        selected_csv.push(div[k].getAttribute('data-value'));
+      }
+      console.log(selected_csv);
+      //parse each entry of array and gen cards
+      for (let l = 0, n = selected_csv.length; l < n; l++) {
+        //      for (var l = 0; l < selected_csv.length; l++) {
+        Papa.parse(selected_csv[l], {
+          download: true,
+          delimiter: ",",
+          skipEmptyLines: true,
+          header: true,
+          complete: function (result) {
+            //let selected_data = result.data;
+            combined_arrays.push(...result.data);
+            //shuffleArray(selected_data);
+            //console.log(selected_data);
+            //renderData(selected_data);
+            //gentable(combined_arrays);
+            if (l +1  === n) {
+              gentable();
+            }            // shuffle();
+          }
+        });
+      };
+    };
+
+    var combined_arrays = [];
+
+    function gentable() {
+      update();
+      shuffleArray(combined_arrays)
+      var comb = combined_arrays;
+      var columns = 6,
+        //l = combined_arrays.length, i,
+        table = document.createElement('table'),
+        tbody = table.appendChild(document.createElement('tbody')),
+        tr, td, img;
+      let display = document.getElementById("cards");
+
+      for (i = 0, l = comb.length; i < l; i++) {
+        if (i % columns == 0) tr = tbody.appendChild(document.createElement('tr'));
+        let card = document.createElement("div");
+        card.setAttribute('class', 'card');
+        let qimages = document.createElement('img');
+        qimages.setAttribute('class', 'qimages');
+        qimages.setAttribute('src', '../.assets/' + comb[i].value);
+        tr.appendChild(document.createElement('td'))
+          .appendChild(card)
+          .appendChild(qimages)
+        //.src = '../.assets/' + combined_arrays[i].value;
+      }
+      display.appendChild(table).setAttribute('class', 'card_table');
+      return;
+    };
+
+    // function to generate cards from parsed array
+    selected_data = undefined;
+    function renderData(selected_data) {
+      //let display = document.getElementById("cards");
+      for (let i = 0, n = selected_data.length; i < n; i++) {
+        console.log(selected_data[i].value);
+        //console.log(selected_data[i].label);
+        let card = document.createElement("div");
+        card.setAttribute('class', 'card');
+        let qimages = document.createElement('img');
+        qimages.setAttribute('class', 'qimages');
+        qimages.setAttribute('src', '../.assets/' + selected_data[i].value);
+        card.append(qimages);
+        display.append(card);
+      }
+    }
+
+    function shuffleArray(combined_arrays) {
+      for (let i = combined_arrays.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const temp = combined_arrays[i];
+        combined_arrays[i] = combined_arrays[j];
+        combined_arrays[j] = temp;
+      }
+      return combined_arrays;
+    }
+
+    //add remove class
+    function toggleclass(selectable) {
+      window.clicked = selectable;
+      if (clicked.classList.contains('selected')) {
+        clicked.classList.remove('selected');
+        clicked.classList.add('selectable');
+      }
+      else {
+        clicked.classList.remove('selectable');
+        clicked.classList.add('selected');
+      };
+    }
+
+
+    function hidetop() {
+      let top = document.querySelector(".top");
+      top.setAttribute("style", "display: none");
+    }
+
+    function showtop() {
+      let top = document.querySelector(".top");
+      top.setAttribute("style", "display: block");
+      combined_arrays.length = 0;
+    }
+
+    // function to remove old cards from deck
+    async function removesel() {
+      var x, i;
+      x = document.querySelectorAll(".selected");
+      for (i = 0; i < x.length; i++) {
+        x[i].setAttribute('class', 'selectable');
+      }
+      return;
+    }
+
+    // function to remove old cards from deck
+    function removeold() {
+      var x, i;
+      x = document.querySelectorAll(".card_table");
+      for (i = 0; i < x.length; i++) {
+        x[i].remove();
+      }
+    }
+
+
+    var frame_to_gen = 36;
+    let gen_frame = document.getElementById("number_layout");
+    function genframe() {
+      for (let i = 0; i < frame_to_gen; i++) {
+        divnumber = document.createElement("div");
+        divnumber.className = "number";
+        //divnumber.setAttribute('onclick', 'toggleclass(this);');
+        //divnumber.id = 'a' + i;
+        //divnumber.innerHTML = i + 1;
+        gen_frame.append(divnumber);
+        const childb = document.createElement("b");
+        childb.innerHTML = i + 1;
+        divnumber.appendChild(childb);
+      }
+    }
+
+    // shuffle cards 
+    function shuffle() {
+      $(".cards_layout").each(function () {
+        var divs = $(this).find('.card');
+        for (var i = 0; i < divs.length; i++) $(divs[i]).remove();
+        //the fisher yates algorithm, from http://stackoverflow.com/questions/2450954/how-to-randomize-a-javascript-array
+        var i = divs.length;
+        if (i == 0) return false;
+        while (--i) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var tempi = divs[i];
+          var tempj = divs[j];
+          divs[i] = tempj;
+          divs[j] = tempi;
+        }
+        for (var i = 0; i < divs.length; i++) $(divs[i]).appendTo(this);
+      });
+    }
+    // show side panel
+    $('.arrowr').click(function () {
+      $('.top').animate({
+        position: "absolute",
+        left: "0px"
+      }, 80);
+    });
+
+    function splice() {
+      $("<div class='card'></div>").insertAfter("#a13");
+      $("<div class='card'></div>").insertAfter("#a13");
+      $("<div class='card'></div>").insertAfter("#a17");
+      $("<div class='card'></div>").insertAfter("#a17");
+    }
+  </script>
+</body>
+
+</html>
